@@ -22,22 +22,22 @@ function initialize() {
     var body = document.getElementById('icons');
     var fxosBanner = document.createElement('div');
     fxosBanner.classList.add('fxos-banner');
-    fxosBanner.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: absolute; z-index: 3000; top: 15%; left: 1em; right: 1em; height: auto; border: 1px solid black; color: white;');
+    fxosBanner.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: relative; width: 90%; height: 175px; margin-left: 5%; margin-right: 5%; border: 1px solid black; color: white;');
     var bannerPicture = document.createElement('div');
     //bannerPicture.src="css/timagin.jpg";
     bannerPicture.id="banner-countdown";
-    bannerPicture.setAttribute('style', 'background-image: '+imageBackgroundBase64+'; background-repeat: no-repeat; background-size: cover; min-height: 100px; width: 100%;');
+    bannerPicture.setAttribute('style', 'background-image: '+imageBackgroundBase64+'; background-repeat: no-repeat; background-size: cover; min-height: 100px; width: 100%; border-bottom: 1px solid black;');
     var countdownText = document.createElement('div');
     countdownText.id="phjou-countdown";
     var closeBtn = document.createElement('button');
     
-    countdownText.setAttribute('style', 'float: left; padding-top: 0.5em; margin-left: 5%; width: 75%; line-height: 16px; left: 1em; margin: 0;');
+    countdownText.setAttribute('style', 'float: left; padding-top: 0.5em; width: 75%; line-height: 16px; left: 1em; margin: 0; margin-left: 5%;');
     closeBtn.setAttribute('style', 'width: 20%; padding-top: 0.5em; font-size: 18px; line-height: 2em; right: 0.33em; border: none; background: none; display: block; color: white;');
 
     fxosBanner.appendChild(bannerPicture);
     fxosBanner.appendChild(countdownText);
     fxosBanner.appendChild(closeBtn);
-    body.appendChild(fxosBanner);
+    body.insertBefore(fxosBanner, body.firstChild);
     compte_a_rebours("T'imagin 2", "Mar 12 00:00:00 2016");
 
     closeBtn.textContent = 'X';

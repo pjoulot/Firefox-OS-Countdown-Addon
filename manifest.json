@@ -6,7 +6,7 @@
     "author": "Philippe Joulot",
     "content_scripts": [{
       "matches": ["app://system.gaiamobile.org/index.html", "app://verticalhome.gaiamobile.org/index.html*"],
-      "css": ["css/style.css"],
+      "css": [],
       "js": ["js/index.js"]
     }],
     "icons": {

@@ -30,6 +30,9 @@ function initialize() {
     var countdownText = document.createElement('div');
     countdownText.id="phjou-countdown";
     var closeBtn = document.createElement('button');
+    
+    countdownText.setAttribute('style', 'position: absolute; padding-top: 0.5em; width: 75%; line-height: 16px; left: 1em; margin: 0;');
+    closeBtn.setAttribute('style', '  padding-top: 0.5em; font-size: 18px; line-height: 2em; right: 0.33em; border: none; background: none; display: block;');
 
     fxosBanner.appendChild(bannerPicture);
     fxosBanner.appendChild(countdownText);

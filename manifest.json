@@ -1,0 +1,15 @@
+{
+    "manifest_version": 1,
+    "name": "CountDown Addon",
+    "description": "An addon to create a countdown on the homescreen",
+    "version": "1.0",
+    "author": "Philippe Joulot",
+    "content_scripts": [{
+      "matches": ["app://system.gaiamobile.org/index.html", "app://verticalhome.gaiamobile.org/index.html*"],
+      "css": ["css/style.css"],
+      "js": ["js/index.js"]
+    }],
+    "icons": {
+      "128": "/icons/128.png"
+    }
+}

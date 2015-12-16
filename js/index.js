@@ -22,7 +22,7 @@ function initialize() {
     var body = document.getElementById('icons');
     var fxosBanner = document.createElement('div');
     fxosBanner.classList.add('fxos-banner');
-    fxosBanner.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: absolute; z-index: 3000; top: 15%; left: 1em; right: 1em; height: 150px; border: 1px solid black; color: white;');
+    fxosBanner.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: absolute; z-index: 3000; top: 15%; left: 1em; right: 1em; height: auto; border: 1px solid black; color: white;');
     var bannerPicture = document.createElement('div');
     //bannerPicture.src="css/timagin.jpg";
     bannerPicture.id="banner-countdown";
@@ -31,8 +31,8 @@ function initialize() {
     countdownText.id="phjou-countdown";
     var closeBtn = document.createElement('button');
     
-    countdownText.setAttribute('style', 'position: absolute; padding-top: 0.5em; width: 75%; line-height: 16px; left: 1em; margin: 0;');
-    closeBtn.setAttribute('style', '  padding-top: 0.5em; font-size: 18px; line-height: 2em; right: 0.33em; border: none; background: none; display: block;');
+    countdownText.setAttribute('style', 'float: left; padding-top: 0.5em; margin-left: 5%; width: 75%; line-height: 16px; left: 1em; margin: 0;');
+    closeBtn.setAttribute('style', 'width: 20%; padding-top: 0.5em; font-size: 18px; line-height: 2em; right: 0.33em; border: none; background: none; display: block; color: white;');
 
     fxosBanner.appendChild(bannerPicture);
     fxosBanner.appendChild(countdownText);

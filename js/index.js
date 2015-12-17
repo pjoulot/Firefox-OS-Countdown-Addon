@@ -38,7 +38,7 @@ function initialize() {
     fxosBanner.appendChild(countdownText);
     fxosBanner.appendChild(closeBtn);
     body.insertBefore(fxosBanner, body.firstChild);
-    compte_a_rebours("T'imagin 2", "Mar 12 00:00:00 2016");
+    compte_a_rebours("T'imagin 2", "Mar 12 00:00:00 2016", false);
 
     closeBtn.textContent = 'X';
 
@@ -48,13 +48,13 @@ function initialize() {
   }
 }
 
-function compte_a_rebours(nom_evenement, date_fin) {
+function compte_a_rebours(nom_evenement, date_fin, full_date_display) {
   var nIntervId = setInterval(function() {
-    compte_a_rebours_task(nom_evenement, date_fin);
+    compte_a_rebours_task(nom_evenement, date_fin, full_date_display);
   }, 1000);
 }
 
-function compte_a_rebours_task(nom_evenement, date_fin)
+function compte_a_rebours_task(nom_evenement, date_fin, full_date_display)
 {
 	var compte_a_rebours = document.getElementById("phjou-countdown");
 	var compte_a_rebours_p = document.querySelector("#phjou-countdown p");
@@ -66,8 +66,15 @@ function compte_a_rebours_task(nom_evenement, date_fin)
 	var date_actuelle = new Date();
 	var date_evenement = new Date(date_fin);
 	var total_secondes = (date_evenement - date_actuelle) / 1000;
-
-	var prefixe = nom_evenement+" dans ";
+  
+  var all_words = get_all_countdown_words();
+  if(full_date_display) {
+		all_words = all_words['full'];
+	}
+	else {
+		all_words = all_words['min'];
+	}
+	var prefixe = nom_evenement+all_words[5];
 	if (total_secondes < 0)
 	{
 		prefixe = "Compte à rebours terminé il y a "; // On modifie le préfixe si la différence est négatif
@@ -83,65 +90,22 @@ function compte_a_rebours_task(nom_evenement, date_fin)
 		minutes = Math.floor((total_secondes - ((jours * 60 * 60 * 24 + heures * 60 * 60))) / 60);
 		secondes = Math.floor(total_secondes - ((jours * 60 * 60 * 24 + heures * 60 * 60 + minutes * 60)));
 
-		var et = "et";
-		var mot_jour = "jours,";
-		var mot_heure = "heures,";
-		var mot_minute = "minutes,";
-		var mot_seconde = "secondes";
-
-		if (jours == 0)
-		{
-			jours = '';
-			mot_jour = '';
-		}
-		else if (jours == 1)
-		{
-			mot_jour = "jour,";
-		}
-
-		if (heures == 0)
-		{
-			heures = '';
-			mot_heure = '';
-		}
-		else if (heures == 1)
-		{
-			mot_heure = "heure,";
-		}
-
-		if (minutes == 0)
-		{
-			minutes = '';
-			mot_minute = '';
-		}
-		else if (minutes == 1)
-		{
-			mot_minute = "minute,";
-		}
-
-		if (secondes == 0)
-		{
-			secondes = '';
-			mot_seconde = '';
-			et = '';
-		}
-		else if (secondes == 1)
-		{
-			mot_seconde = "seconde";
-		}
-
-		if (minutes == 0 && heures == 0 && jours == 0)
-		{
-			et = "";
-		}
-		compte_a_rebours_p.appendChild(document.createTextNode(prefixe + jours + ' ' + mot_jour + ' ' + heures + ' ' + mot_heure + ' ' + minutes + ' ' + mot_minute + ' ' + et + ' ' + secondes + ' ' + mot_seconde));
+		compte_a_rebours_p.appendChild(document.createTextNode(prefixe + jours + ' ' + all_words[0] + ' ' + heures + ' ' + all_words[1] + ' ' + minutes + ' ' + all_words[2] + ' ' + all_words[4] + ' ' + secondes + ' ' + all_words[3]));
 		
 	}
 	else
 	{
 		compte_a_rebours_p.appendChild(document.createTextNode('Compte à rebours terminé.'));
 	}
-        compte_a_rebours.appendChild(compte_a_rebours_p);
+  compte_a_rebours.appendChild(compte_a_rebours_p);
+}
+
+function get_all_countdown_words() {
+  var words = {
+    'min' : ["j", "h", "m", "s", "", " dans "],
+    'full': ["jours", "heures", "minutes", "secondes", "et", " dans "]
+  };
+  return(words);
 }
 
 function get_image_base64() {

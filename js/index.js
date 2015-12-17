@@ -17,6 +17,7 @@ function initialize() {
     return;
   } else {
   
+    var user_language = select_language(window.navigator.language);
     var imageBackgroundBase64 = get_image_base64();
   
     var body = document.getElementById('icons');
@@ -38,7 +39,7 @@ function initialize() {
     fxosBanner.appendChild(countdownText);
     fxosBanner.appendChild(closeBtn);
     body.insertBefore(fxosBanner, body.firstChild);
-    compte_a_rebours("T'imagin 2", "Mar 12 00:00:00 2016", false);
+    compte_a_rebours("T'imagin 2", "Mar 12 00:00:00 2016", false, user_language);
 
     closeBtn.textContent = 'X';
 
@@ -48,13 +49,20 @@ function initialize() {
   }
 }
 
-function compte_a_rebours(nom_evenement, date_fin, full_date_display) {
+function compte_a_rebours(nom_evenement, date_fin, full_date_display, user_language) {
+  var all_words = get_all_countdown_words()[user_language];
+  if(full_date_display) {
+	all_words = all_words['full'];
+  }
+  else {
+	all_words = all_words['min'];
+  }
   var nIntervId = setInterval(function() {
-    compte_a_rebours_task(nom_evenement, date_fin, full_date_display);
+    compte_a_rebours_task(nom_evenement, date_fin, all_words);
   }, 1000);
 }
 
-function compte_a_rebours_task(nom_evenement, date_fin, full_date_display)
+function compte_a_rebours_task(nom_evenement, date_fin, all_words)
 {
 	var compte_a_rebours = document.getElementById("phjou-countdown");
 	var compte_a_rebours_p = document.querySelector("#phjou-countdown p");
@@ -67,13 +75,6 @@ function compte_a_rebours_task(nom_evenement, date_fin, full_date_display)
 	var date_evenement = new Date(date_fin);
 	var total_secondes = (date_evenement - date_actuelle) / 1000;
   
-  var all_words = get_all_countdown_words();
-  if(full_date_display) {
-		all_words = all_words['full'];
-	}
-	else {
-		all_words = all_words['min'];
-	}
 	var prefixe = nom_evenement+all_words[5];
 	if (total_secondes < 0)
 	{
@@ -101,11 +102,24 @@ function compte_a_rebours_task(nom_evenement, date_fin, full_date_display)
 }
 
 function get_all_countdown_words() {
-  var words = {
-    'min' : ["j", "h", "m", "s", "", " dans "],
-    'full': ["jours", "heures", "minutes", "secondes", "et", " dans "]
-  };
-  return(words);
+  return ({
+    'en' : {
+      'min' : ["d", "h", "m", "s", "", " in "],
+      'full': ["days", "hours", "minutes", "seconds", "and", " in "]
+    },
+    'fr' : {
+      'min' : ["j", "h", "m", "s", "", " dans "],
+      'full': ["jours", "heures", "minutes", "secondes", "et", " dans "]
+    },
+  });
+}
+
+function select_language(language_code) {
+  var lang = 'en';
+  if(language_code == 'fr' || language_code.indexOf('fr-') > -1) {
+    lang = 'fr';
+  }
+  return lang;
 }
 
 function get_image_base64() {

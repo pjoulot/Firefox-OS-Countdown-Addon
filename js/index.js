@@ -77,19 +77,101 @@ function countdown_settings(config) {
       insertPlace = insertPlace.parentNode.nextElementSibling;
       if(insertPlace.nodeName.toLowerCase() == "ul") {
         var wordsSettings = get_all_countdown_words()[config.language]['settings'];
-      
+        
+        //Create the page for the countdown settings
+        var countdownSettingsPage = document.createElement('section');
+        countdownSettingsPage.setAttribute('id', 'countdown-addon');
+        countdownSettingsPage.setAttribute('role', 'region');
+        countdownSettingsPage.setAttribute('data-rendered', 'true');
+        
+        var countdownSettingsPageString = '<gaia-header action="back" data-href="#root">';
+        countdownSettingsPageString += '<h1>'+wordsSettings[0]+'</h1>';
+        countdownSettingsPageString += '</gaia-header>';
+
+        countdownSettingsPageString += '<div>';
+        countdownSettingsPageString += '<section data-type="list">';
+        countdownSettingsPageString += '<header>';
+        countdownSettingsPageString += '<h2>'+wordsSettings[1]+'</h2>';
+        countdownSettingsPageString += '</header>';
+        countdownSettingsPageString += '<div class="wallpaper">';
+        countdownSettingsPageString += '<img class="wallpaper-preview" alt="wallpaper preview"/>';
+        countdownSettingsPageString += '<button class="wallpaper-button">';
+        countdownSettingsPageString += '<span data-icon="change-wallpaper" data-l10n-id="changeWallpaperButton"></span>';
+        countdownSettingsPageString += '</button>';
+        countdownSettingsPageString += '</div>';
+        
+        countdownSettingsPageString += '<header>';
+        countdownSettingsPageString += '<h2>'+wordsSettings[2]+'</h2>';
+        countdownSettingsPageString += '</header>';
+        countdownSettingsPageString += '<ul>';
+        countdownSettingsPageString += '<li>';
+        countdownSettingsPageString += '<p>'+wordsSettings[2]+'</p>';
+        countdownSettingsPageString += '<div class="button icon icon-dialog">';
+        countdownSettingsPageString += '<input type="text" name="countdown.name" />';
+        countdownSettingsPageString += '</div>';
+        countdownSettingsPageString += '</li>';
+        countdownSettingsPageString += '</ul>';
+        
+        countdownSettingsPageString += '<header>';
+        countdownSettingsPageString += '<h2 data-l10n-id="dateMessage"></h2>';
+        countdownSettingsPageString += '</header>';
+        countdownSettingsPageString += '<ul class="time-manual">';
+        countdownSettingsPageString += '<li>';
+        countdownSettingsPageString += '<p data-l10n-id="dateMessage"></p>';
+        countdownSettingsPageString += '<input type="date" class="date-picker" min="1970-1-1" max="2035-12-31"/>';
+        countdownSettingsPageString += '</li>';
+        countdownSettingsPageString += '<li>';
+        countdownSettingsPageString += '<p data-l10n-id="timeMessage"></p>';
+        countdownSettingsPageString += '<input type="time" class="time-picker"/>';
+        countdownSettingsPageString += '</li>';
+        countdownSettingsPageString += '</ul>';
+
+        countdownSettingsPageString += '<header>';
+        countdownSettingsPageString += '<h2>'+wordsSettings[3]+'</h2>';
+        countdownSettingsPageString += '</header>';
+        countdownSettingsPageString += '<ul>';
+        countdownSettingsPageString += '<li>';
+        countdownSettingsPageString += '<p>'+wordsSettings[3]+'</p>';
+        countdownSettingsPageString += '<div class="button icon icon-dialog">';
+        countdownSettingsPageString += '<select name="countdown.display">';
+        countdownSettingsPageString += '<option value="3">'+wordsSettings[4]+'</option>';
+        countdownSettingsPageString += '<option value="4">'+wordsSettings[5]+'</option>';
+        countdownSettingsPageString += '</select>';
+        countdownSettingsPageString += '</div>';
+        countdownSettingsPageString += '</li>';
+        countdownSettingsPageString += '</ul>';
+
+        countdownSettingsPageString += '</section>';
+        countdownSettingsPageString += '</div>';
+
+        //countdownSettingsPageString += '<panel data-path="panels/homescreens/panel"></panel>';
+        
+        countdownSettingsPage.innerHTML = countdownSettingsPageString;
+        
+        var body = document.querySelector('body');
+        body.appendChild(countdownSettingsPage);
+        
+        //Create the link into the root page of the settings app
         var countdownSettingsElement = document.createElement('li');
-        countdownSettingsElement.classList.add('countdown-addon-settings', 'menu-item');
+        countdownSettingsElement.classList.add('countdown-addon-settings');
         var countdownSettingsElementLink = document.createElement('a');
+        countdownSettingsElementLink.classList.add('menu-item');
+        countdownSettingsElementLink.setAttribute('aria-label', wordsSettings[0]);
+        countdownSettingsElementLink.setAttribute('aria-describedby', 'countdown-addon-desc');
+        countdownSettingsElementLink.setAttribute('href', '#countdown-addon');
+        countdownSettingsElementLink.setAttribute('data-icon', '⌛');
         
         var countdownSettingsElementSpan = document.createElement('span');
         countdownSettingsElementSpan.appendChild(document.createTextNode(wordsSettings[0]));
         var countdownSettingsElementSmall = document.createElement('small');
+        countdownSettingsElementSmall.setAttribute('id', 'countdown-addon-desc');
+        countdownSettingsElementSmall.classList.add('menu-item-desc');
         countdownSettingsElementLink.appendChild(countdownSettingsElementSpan);
         countdownSettingsElementLink.appendChild(countdownSettingsElementSmall);
         
         countdownSettingsElement.appendChild(countdownSettingsElementLink);
         insertPlace.appendChild(countdownSettingsElement);
+        
       }
     }
   }
@@ -179,12 +261,12 @@ function get_all_countdown_words() {
     'en' : {
       'min' : ["d", "h", "m", "s", "", " in "],
       'full': ["days", "hours", "minutes", "seconds", "and", " in "],
-      'settings': ['Countdown']
+      'settings': ['Countdown', 'Background image', 'Event name', 'Display mode', 'Full words', 'Abbreviations']
     },
     'fr' : {
       'min' : ["j", "h", "m", "s", "", " dans "],
       'full': ["jours", "heures", "minutes", "secondes", "et", " dans "],
-      'settings': ['Compte à rebours']
+      'settings': ['Compte à rebours', 'Image de fond', 'Nom de l\'événement', 'Mode d\'affichage', 'Mots complets', 'Abréviations']
     },
   });
 }

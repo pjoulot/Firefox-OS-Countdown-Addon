@@ -94,12 +94,13 @@ function countdown_settings(config) {
         countdownSettingsPageString += '<h2>'+wordsSettings[1]+'</h2>';
         countdownSettingsPageString += '</header>';
         countdownSettingsPageString += '<div class="wallpaper">';
-        countdownSettingsPageString += '<img class="wallpaper-preview" alt="wallpaper preview"/>';
-        countdownSettingsPageString += '<button class="wallpaper-button">';
+        countdownSettingsPageString += '<img class="countdown-wallpaper" alt="wallpaper preview" style="margin-top: -10rem; position: absolute; width: 100%;" />';
+        countdownSettingsPageString += '<button class="wallpaper-button countdown-background-button">';
         countdownSettingsPageString += '<span data-icon="change-wallpaper" data-l10n-id="changeWallpaperButton"></span>';
         countdownSettingsPageString += '</button>';
         countdownSettingsPageString += '</div>';
         
+        //@todo Search why the countdown.name input is automatically saved into the Settings
         countdownSettingsPageString += '<header>';
         countdownSettingsPageString += '<h2>'+wordsSettings[2]+'</h2>';
         countdownSettingsPageString += '</header>';
@@ -118,14 +119,15 @@ function countdown_settings(config) {
         countdownSettingsPageString += '<ul class="time-manual">';
         countdownSettingsPageString += '<li>';
         countdownSettingsPageString += '<p data-l10n-id="dateMessage"></p>';
-        countdownSettingsPageString += '<input type="date" class="date-picker" min="1970-1-1" max="2035-12-31"/>';
+        countdownSettingsPageString += '<input class="countdown-date-input date-picker" type="date" name="countdown.date" value="" min="1970-1-1" max="2035-12-31"/>';
         countdownSettingsPageString += '</li>';
         countdownSettingsPageString += '<li>';
         countdownSettingsPageString += '<p data-l10n-id="timeMessage"></p>';
-        countdownSettingsPageString += '<input type="time" class="time-picker"/>';
+        countdownSettingsPageString += '<input type="time" name="countdown.time" class="countdown-time-input time-picker"/>';
         countdownSettingsPageString += '</li>';
         countdownSettingsPageString += '</ul>';
 
+        //@todo Search why the countdown.display input is automatically saved into the Settings
         countdownSettingsPageString += '<header>';
         countdownSettingsPageString += '<h2>'+wordsSettings[3]+'</h2>';
         countdownSettingsPageString += '</header>';
@@ -133,9 +135,9 @@ function countdown_settings(config) {
         countdownSettingsPageString += '<li>';
         countdownSettingsPageString += '<p>'+wordsSettings[3]+'</p>';
         countdownSettingsPageString += '<div class="button icon icon-dialog">';
-        countdownSettingsPageString += '<select name="countdown.display">';
-        countdownSettingsPageString += '<option value="3">'+wordsSettings[4]+'</option>';
-        countdownSettingsPageString += '<option value="4">'+wordsSettings[5]+'</option>';
+        countdownSettingsPageString += '<select class="countdown-display-input" name="countdown.display">';
+        countdownSettingsPageString += '<option value="1">'+wordsSettings[4]+'</option>';
+        countdownSettingsPageString += '<option value="2">'+wordsSettings[5]+'</option>';
         countdownSettingsPageString += '</select>';
         countdownSettingsPageString += '</div>';
         countdownSettingsPageString += '</li>';
@@ -144,12 +146,27 @@ function countdown_settings(config) {
         countdownSettingsPageString += '</section>';
         countdownSettingsPageString += '</div>';
 
-        //countdownSettingsPageString += '<panel data-path="panels/homescreens/panel"></panel>';
-        
         countdownSettingsPage.innerHTML = countdownSettingsPageString;
         
         var body = document.querySelector('body');
         body.appendChild(countdownSettingsPage);
+        
+        var inputCountdownDate = document.querySelector('.countdown-date-input');
+        get_input_mozSettings('countdown.date');
+        inputCountdownDate.addEventListener("input", function(){
+          set_onchange_input_mozSettings(this);
+        }, false);
+        
+        var inputCountdownTime = document.querySelector('.countdown-time-input');
+        get_input_mozSettings('countdown.time');
+        inputCountdownTime.addEventListener("input", function(){
+          set_onchange_input_mozSettings(this);
+        }, false);
+        
+        var buttonCountdownBackground = document.querySelector('.countdown-background-button');
+        buttonCountdownBackground.addEventListener("click", function(){
+          select_countdown_background();
+        }, false);
         
         //Create the link into the root page of the settings app
         var countdownSettingsElement = document.createElement('li');
@@ -174,6 +191,64 @@ function countdown_settings(config) {
         
       }
     }
+  }
+}
+
+function select_countdown_background() {
+  var mozActivity = new MozActivity({
+    name: 'pick',
+    data: {
+      type: ['image/*'],
+      // XXX: This will not work with Desktop Fx / Simulator.
+      width: Math.ceil(window.screen.width * window.devicePixelRatio),
+      height: Math.ceil(window.screen.height * window.devicePixelRatio)
+    }
+  });
+  mozActivity.onsuccess = function() {
+    if (!this.result.blob) {
+      return;
+    }
+    var obj = {};
+    obj['countdown.background'] = this.result.blob;
+    var lock = navigator.mozSettings.createLock();
+    var result = lock.set(obj);
+    result.onsuccess = function () {
+      console.log("the settings has been changed");
+    }
+    var backgroundCountdownImage = document.querySelector('.countdown-wallpaper');
+    var blobUrl = URL.createObjectURL(this.result.blob);
+    backgroundCountdownImage.setAttribute('src', blobUrl);
+  };
+
+  mozActivity.onerror = function() {
+    console.log("The pick mozActivity has failed");
+  }
+}
+
+function set_onchange_input_mozSettings(input) {
+  var name = input.getAttribute("name");
+  var obj = {};
+  obj[name] = input.value;
+  var lock = navigator.mozSettings.createLock();
+  var result = lock.set(obj);
+  result.onsuccess = function () {
+    console.log("the settings has been changed");
+  }
+  result.onerror = function () {
+    console.log("An error occure, the settings remain unchanged");
+  }
+}
+
+function get_input_mozSettings(name) {
+  var lock    = navigator.mozSettings.createLock();
+  var setting = lock.get(name);
+  setting.onsuccess = function () {
+    var inputElement = document.querySelector('*[name="'+name+'"]');
+    inputElement.setAttribute('value', setting.result[name]);
+  }
+
+  setting.onerror = function () {
+    console.warn('An error occured: ' + setting.error);
   }
 }
 

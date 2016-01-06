@@ -396,7 +396,7 @@ function compte_a_rebours_task(nom_evenement, date_fin, all_words)
 	}
 	else
 	{
-		compte_a_rebours_p.appendChild(document.createTextNode('Compte à rebours terminé.'));
+		compte_a_rebours_p.appendChild(document.createTextNode(nom_evenement+all_words[6]));
 	}
   compte_a_rebours.appendChild(compte_a_rebours_p);
 }
@@ -407,13 +407,13 @@ function compte_a_rebours_task(nom_evenement, date_fin, all_words)
 function get_all_countdown_words() {
   return ({
     'en' : {
-      'min' : ["d", "h", "m", "s", "", " in "],
-      'full': ["days", "hours", "minutes", "seconds", "and", " in "],
+      'min' : ["d", "h", "m", "s", "", " in ", "Finished"],
+      'full': ["days", "hours", "minutes", "seconds", "and", " in ", " has already begun!"],
       'settings': ['Countdown', 'Background image', 'Event name', 'Display mode', 'Full words', 'Abbreviations']
     },
     'fr' : {
-      'min' : ["j", "h", "m", "s", "", " dans "],
-      'full': ["jours", "heures", "minutes", "secondes", "et", " dans "],
+      'min' : ["j", "h", "m", "s", "", " dans ", "Terminé"],
+      'full': ["jours", "heures", "minutes", "secondes", "et", " dans ", " a déjà commencé!"],
       'settings': ['Compte à rebours', 'Image de fond', 'Nom de l\'événement', 'Mode d\'affichage', 'Mots complets', 'Abréviations']
     },
   });

@@ -1,3 +1,6 @@
+const WIDTH_COUNTDOWN = 90; // in %
+const HEIGHT_COUNTDOWN = 175; // in px
+
 // If injecting into an app that was already running at the time
 // the app was enabled, simply initialize it.
 if (document.documentElement) {
@@ -93,7 +96,8 @@ function countdown_homescreen(config) {
       var body = document.getElementById('icons');
       var fxosBanner = document.createElement('div');
       fxosBanner.classList.add('fxos-banner');
-      fxosBanner.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: relative; width: 90%; height: 175px; margin-left: 5%; margin-right: 5%; border: 1px solid black; color: white;');
+      var margeSize = (100 - WIDTH_COUNTDOWN) / 2;
+      fxosBanner.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: relative; width: '+WIDTH_COUNTDOWN+'%; height: '+HEIGHT_COUNTDOWN+'px; margin-left: '+margeSize+'%; margin-right: '+margeSize+'%; border: 1px solid black; color: white;');
       var bannerPicture = document.createElement('div');
       //bannerPicture.src="css/timagin.jpg";
       bannerPicture.id="banner-countdown";
@@ -149,8 +153,8 @@ function countdown_settings(config) {
         countdownSettingsPageString += '<header>';
         countdownSettingsPageString += '<h2>'+wordsSettings[1]+'</h2>';
         countdownSettingsPageString += '</header>';
-        countdownSettingsPageString += '<div class="wallpaper">';
-        countdownSettingsPageString += '<img class="countdown-wallpaper" alt="wallpaper preview" style="margin-top: -10rem; position: absolute; width: 100%;" />';
+        countdownSettingsPageString += '<div class="wallpaper" style="height:9rem;">';
+        countdownSettingsPageString += '<img class="countdown-wallpaper" alt="wallpaper preview" style="position: absolute; width: 100%;" />';
         countdownSettingsPageString += '<button class="wallpaper-button countdown-background-button">';
         countdownSettingsPageString += '<span data-icon="change-wallpaper" data-l10n-id="changeWallpaperButton"></span>';
         countdownSettingsPageString += '</button>';
@@ -252,13 +256,15 @@ function countdown_settings(config) {
 }
 
 function select_countdown_background() {
+  var widthCountdown = (window.screen.width) * (WIDTH_COUNTDOWN / 100); 
+  var heightCountdown = HEIGHT_COUNTDOWN; 
   var mozActivity = new MozActivity({
     name: 'pick',
     data: {
       type: ['image/*'],
       // XXX: This will not work with Desktop Fx / Simulator.
-      width: Math.ceil(window.screen.width * window.devicePixelRatio),
-      height: Math.ceil(window.screen.height * window.devicePixelRatio)
+      width: Math.ceil(widthCountdown * window.devicePixelRatio),
+      height: Math.ceil(heightCountdown)
     }
   });
   mozActivity.onsuccess = function() {

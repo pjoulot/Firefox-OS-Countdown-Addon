@@ -59,6 +59,7 @@ function initialize() {
     countdownConfiguration.name = event.settingValue
   }
 
+  //Add listeners to the settings to make changes when user modify
   navigator.mozSettings.addObserver('countdown.display', handleCountdownDisplayChanged);
   function handleCountdownDisplayChanged(event) {
     countdownConfiguration.display = event.settingValue
@@ -82,10 +83,13 @@ function initialize() {
   }
 }
 
+/*
+** Function to add the countdown on the homescreen
+*/
 function countdown_homescreen(config) {
   var url = get_app_url_without_tag();
   if(url == "app://verticalhome.gaiamobile.org/index.html") {
-    if (document.querySelector('.fxos-banner')) {
+    if (document.querySelector('.addon-countdown')) {
       // Already injected, abort.
       return;
     } else {
@@ -94,25 +98,25 @@ function countdown_homescreen(config) {
       var imageBackgroundBase64 = get_image_base64();
 
       var body = document.getElementById('icons');
-      var fxosBanner = document.createElement('div');
-      fxosBanner.classList.add('fxos-banner');
+      var coundownAddonContainer = document.createElement('div');
+      coundownAddonContainer.classList.add('addon-countdown');
       var margeSize = (100 - WIDTH_COUNTDOWN) / 2;
-      fxosBanner.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: relative; width: '+WIDTH_COUNTDOWN+'%; height: '+HEIGHT_COUNTDOWN+'px; margin-left: '+margeSize+'%; margin-right: '+margeSize+'%; border: 1px solid black; color: white;');
+      coundownAddonContainer.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: relative; width: '+WIDTH_COUNTDOWN+'%; height: '+HEIGHT_COUNTDOWN+'px; margin-left: '+margeSize+'%; margin-right: '+margeSize+'%; border: 1px solid black; color: white;');
       var bannerPicture = document.createElement('div');
       //bannerPicture.src="css/timagin.jpg";
       bannerPicture.id="banner-countdown";
       bannerPicture.setAttribute('style', 'background-image: '+imageBackgroundBase64+'; background-repeat: no-repeat; background-size: cover; min-height: 100px; width: 100%; border-bottom: 1px solid black;');
       var countdownText = document.createElement('div');
-      countdownText.id="phjou-countdown";
+      countdownText.id="addon-countdown";
       var closeBtn = document.createElement('button');
 
       countdownText.setAttribute('style', 'float: left; padding-top: 0.5em; width: 75%; line-height: 16px; left: 1em; margin: 0; margin-left: 5%;');
       closeBtn.setAttribute('style', 'width: 20%; padding-top: 0.5em; font-size: 18px; line-height: 2em; right: 0.33em; border: none; background: none; display: block; color: white;');
 
-      fxosBanner.appendChild(bannerPicture);
-      fxosBanner.appendChild(countdownText);
-      fxosBanner.appendChild(closeBtn);
-      body.insertBefore(fxosBanner, body.firstChild);
+      coundownAddonContainer.appendChild(bannerPicture);
+      coundownAddonContainer.appendChild(countdownText);
+      coundownAddonContainer.appendChild(closeBtn);
+      body.insertBefore(coundownAddonContainer, body.firstChild);
 
       apply_countdown_image();
       compte_a_rebours(config);
@@ -120,12 +124,15 @@ function countdown_homescreen(config) {
       closeBtn.textContent = 'X';
 
       closeBtn.onclick = function() {
-        fxosBanner.parentNode.removeChild(fxosBanner);
+        coundownAddonContainer.parentNode.removeChild(coundownAddonContainer);
       }
     }
   }
 }
 
+/*
+** Function to add the settings page into the Settings App
+*/
 function countdown_settings(config) {
   var url = get_app_url_without_tag();
   if(url == "app://settings.gaiamobile.org/index.html") {
@@ -255,6 +262,9 @@ function countdown_settings(config) {
   }
 }
 
+/*
+** Function to select an image in the settings page for the countdown background
+*/
 function select_countdown_background() {
   var widthCountdown = (window.screen.width) * (WIDTH_COUNTDOWN / 100); 
   var heightCountdown = HEIGHT_COUNTDOWN; 
@@ -288,6 +298,9 @@ function select_countdown_background() {
   }
 }
 
+/*
+** Function to set setting variables when the date and the time input change
+*/
 function set_onchange_input_mozSettings(input) {
   var name = input.getAttribute("name");
   var obj = {};
@@ -302,6 +315,9 @@ function set_onchange_input_mozSettings(input) {
   }
 }
 
+/*
+** Function to get a saved setting value and set the field in the settings app
+*/
 function get_input_mozSettings(name) {
   var lock    = navigator.mozSettings.createLock();
   var setting = lock.get(name);
@@ -370,8 +386,8 @@ function create_date_from_string_date_time(date, time) {
 */
 function compte_a_rebours_task(nom_evenement, date_fin, all_words)
 {
-	var compte_a_rebours = document.getElementById("phjou-countdown");
-	var compte_a_rebours_p = document.querySelector("#phjou-countdown p");
+	var compte_a_rebours = document.getElementById("addon-countdown");
+	var compte_a_rebours_p = document.querySelector("#addon-countdown p");
 	if(compte_a_rebours_p !== null) {
 	  compte_a_rebours_p.parentNode.removeChild(compte_a_rebours_p);
 	}

@@ -15,71 +15,77 @@ else {
 }
 
 function initialize() {
-  var user_language = select_language(window.navigator.language);
-  var countdownConfiguration = {
-    name: "Firefox OS",
-    date: "2016-03-12",
-    time: "00:00:00",
-    display: false,
-    language: user_language
-  };
-  
-  //Overwrite default configuration with user config
-  var lock    = navigator.mozSettings.createLock();
-  var setting = lock.get('countdown.name');
-  setting.onsuccess = function () {
-    countdownConfiguration.name = setting.result['countdown.name'];
-  };
-  var setting2 = lock.get('countdown.display');
-  setting2.onsuccess = function () {
-    countdownConfiguration.display = setting2.result['countdown.display'];
-  };
-  var setting3 = lock.get('countdown.time');
-  setting3.onsuccess = function () {
-    console.log(setting3.result['countdown.time']);
-    countdownConfiguration.time = setting3.result['countdown.time'];
-  };
-  var setting4 = lock.get('countdown.date');
-  setting4.onsuccess = function () {
-    console.log(setting4.result['countdown.date']);
-    countdownConfiguration.date = setting4.result['countdown.date'];
-  };
-  var setting5 = lock.get('countdown.time');
-  setting5.onsuccess = function () {
-    console.log(setting5.result['countdown.time']);
-    countdownConfiguration.time = setting5.result['countdown.time'];
-  };
-  //The background is not done the same way because we do not want to apply the CSS property everytime
-  
-  countdown_homescreen(countdownConfiguration);
-  countdown_settings(countdownConfiguration);
-  
-  navigator.mozSettings.addObserver('countdown.name', handleCountdownNameChanged);
-  function handleCountdownNameChanged(event) {
-    countdownConfiguration.name = event.settingValue
+  if (document.querySelector('.countdown-addon-injected')) {
+      // Already injected, abort.
+      return;
   }
+  else {
+    var user_language = select_language(window.navigator.language);
+    var countdownConfiguration = {
+      name: "Firefox OS",
+      date: "2016-03-12",
+      time: "00:00:00",
+      display: false,
+      language: user_language
+    };
 
-  //Add listeners to the settings to make changes when user modify
-  navigator.mozSettings.addObserver('countdown.display', handleCountdownDisplayChanged);
-  function handleCountdownDisplayChanged(event) {
-    countdownConfiguration.display = event.settingValue
-  }
-  
-  navigator.mozSettings.addObserver('countdown.date', handleCountdownDateChanged);
-  function handleCountdownDateChanged(event) {
-    countdownConfiguration.date = event.settingValue
-  }
-  
-  navigator.mozSettings.addObserver('countdown.time', handleCountdownTimeChanged);
-  function handleCountdownTimeChanged(event) {
-    countdownConfiguration.time = event.settingValue
-  }
-  
-  navigator.mozSettings.addObserver('countdown.background', handleCountdownBackgroundChanged);
-  function handleCountdownBackgroundChanged(event) {
-    var bannerImage = document.getElementById('banner-countdown');
-    var blobUrl = URL.createObjectURL(event.settingValue);
-    bannerImage.style.backgroundImage = "url('"+blobUrl+"')";
+    //Overwrite default configuration with user config
+    var lock    = navigator.mozSettings.createLock();
+    var setting = lock.get('countdown.name');
+    setting.onsuccess = function () {
+      countdownConfiguration.name = setting.result['countdown.name'];
+    };
+    var setting2 = lock.get('countdown.display');
+    setting2.onsuccess = function () {
+      countdownConfiguration.display = setting2.result['countdown.display'];
+    };
+    var setting3 = lock.get('countdown.time');
+    setting3.onsuccess = function () {
+      console.log(setting3.result['countdown.time']);
+      countdownConfiguration.time = setting3.result['countdown.time'];
+    };
+    var setting4 = lock.get('countdown.date');
+    setting4.onsuccess = function () {
+      console.log(setting4.result['countdown.date']);
+      countdownConfiguration.date = setting4.result['countdown.date'];
+    };
+    var setting5 = lock.get('countdown.time');
+    setting5.onsuccess = function () {
+      console.log(setting5.result['countdown.time']);
+      countdownConfiguration.time = setting5.result['countdown.time'];
+    };
+    //The background is not done the same way because we do not want to apply the CSS property everytime
+
+    countdown_homescreen(countdownConfiguration);
+    countdown_settings(countdownConfiguration);
+
+    navigator.mozSettings.addObserver('countdown.name', handleCountdownNameChanged);
+    function handleCountdownNameChanged(event) {
+      countdownConfiguration.name = event.settingValue
+    }
+
+    //Add listeners to the settings to make changes when user modify
+    navigator.mozSettings.addObserver('countdown.display', handleCountdownDisplayChanged);
+    function handleCountdownDisplayChanged(event) {
+      countdownConfiguration.display = event.settingValue
+    }
+
+    navigator.mozSettings.addObserver('countdown.date', handleCountdownDateChanged);
+    function handleCountdownDateChanged(event) {
+      countdownConfiguration.date = event.settingValue
+    }
+
+    navigator.mozSettings.addObserver('countdown.time', handleCountdownTimeChanged);
+    function handleCountdownTimeChanged(event) {
+      countdownConfiguration.time = event.settingValue
+    }
+
+    navigator.mozSettings.addObserver('countdown.background', handleCountdownBackgroundChanged);
+    function handleCountdownBackgroundChanged(event) {
+      var bannerImage = document.getElementById('banner-countdown');
+      var blobUrl = URL.createObjectURL(event.settingValue);
+      bannerImage.style.backgroundImage = "url('"+blobUrl+"')";
+    }
   }
 }
 
@@ -89,43 +95,38 @@ function initialize() {
 function countdown_homescreen(config) {
   var url = get_app_url_without_tag();
   if(url == "app://verticalhome.gaiamobile.org/index.html") {
-    if (document.querySelector('.addon-countdown')) {
-      // Already injected, abort.
-      return;
-    } else {
+    var user_language = select_language(window.navigator.language);
+    var imageBackgroundBase64 = get_image_base64();
 
-      var user_language = select_language(window.navigator.language);
-      var imageBackgroundBase64 = get_image_base64();
+    var body = document.getElementById('icons');
+    var coundownAddonContainer = document.createElement('div');
+    coundownAddonContainer.classList.add('addon-countdown');
+    coundownAddonContainer.classList.add('countdown-addon-injected');
+    var margeSize = (100 - WIDTH_COUNTDOWN) / 2;
+    coundownAddonContainer.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: relative; width: '+WIDTH_COUNTDOWN+'%; height: '+HEIGHT_COUNTDOWN+'px; margin-left: '+margeSize+'%; margin-right: '+margeSize+'%; border: 1px solid black; color: white;');
+    var bannerPicture = document.createElement('div');
+    //bannerPicture.src="css/timagin.jpg";
+    bannerPicture.id="banner-countdown";
+    bannerPicture.setAttribute('style', 'background-image: '+imageBackgroundBase64+'; background-repeat: no-repeat; background-size: cover; min-height: 100px; width: 100%; border-bottom: 1px solid black;');
+    var countdownText = document.createElement('div');
+    countdownText.id="addon-countdown";
+    var closeBtn = document.createElement('button');
 
-      var body = document.getElementById('icons');
-      var coundownAddonContainer = document.createElement('div');
-      coundownAddonContainer.classList.add('addon-countdown');
-      var margeSize = (100 - WIDTH_COUNTDOWN) / 2;
-      coundownAddonContainer.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: relative; width: '+WIDTH_COUNTDOWN+'%; height: '+HEIGHT_COUNTDOWN+'px; margin-left: '+margeSize+'%; margin-right: '+margeSize+'%; border: 1px solid black; color: white;');
-      var bannerPicture = document.createElement('div');
-      //bannerPicture.src="css/timagin.jpg";
-      bannerPicture.id="banner-countdown";
-      bannerPicture.setAttribute('style', 'background-image: '+imageBackgroundBase64+'; background-repeat: no-repeat; background-size: cover; min-height: 100px; width: 100%; border-bottom: 1px solid black;');
-      var countdownText = document.createElement('div');
-      countdownText.id="addon-countdown";
-      var closeBtn = document.createElement('button');
+    countdownText.setAttribute('style', 'float: left; padding-top: 0.5em; width: 75%; line-height: 16px; left: 1em; margin: 0; margin-left: 5%;');
+    closeBtn.setAttribute('style', 'width: 20%; padding-top: 0.5em; font-size: 18px; line-height: 2em; right: 0.33em; border: none; background: none; display: block; color: white;');
 
-      countdownText.setAttribute('style', 'float: left; padding-top: 0.5em; width: 75%; line-height: 16px; left: 1em; margin: 0; margin-left: 5%;');
-      closeBtn.setAttribute('style', 'width: 20%; padding-top: 0.5em; font-size: 18px; line-height: 2em; right: 0.33em; border: none; background: none; display: block; color: white;');
+    coundownAddonContainer.appendChild(bannerPicture);
+    coundownAddonContainer.appendChild(countdownText);
+    coundownAddonContainer.appendChild(closeBtn);
+    body.insertBefore(coundownAddonContainer, body.firstChild);
 
-      coundownAddonContainer.appendChild(bannerPicture);
-      coundownAddonContainer.appendChild(countdownText);
-      coundownAddonContainer.appendChild(closeBtn);
-      body.insertBefore(coundownAddonContainer, body.firstChild);
+    apply_countdown_image();
+    compte_a_rebours(config);
 
-      apply_countdown_image();
-      compte_a_rebours(config);
+    closeBtn.textContent = 'X';
 
-      closeBtn.textContent = 'X';
-
-      closeBtn.onclick = function() {
-        coundownAddonContainer.parentNode.removeChild(coundownAddonContainer);
-      }
+    closeBtn.onclick = function() {
+      coundownAddonContainer.parentNode.removeChild(coundownAddonContainer);
     }
   }
 }
@@ -136,128 +137,122 @@ function countdown_homescreen(config) {
 function countdown_settings(config) {
   var url = get_app_url_without_tag();
   if(url == "app://settings.gaiamobile.org/index.html") {
-    if (document.querySelector('.countdown-addon-settings')) {
-      // Already injected, abort.
-      return;
-    } else {
-      var insertPlace = document.querySelector('header h2[data-l10n-id="personalization"]');
-      insertPlace = insertPlace.parentNode.nextElementSibling;
-      if(insertPlace.nodeName.toLowerCase() == "ul") {
-        var wordsSettings = get_all_countdown_words()[config.language]['settings'];
-        
-        //Create the page for the countdown settings
-        var countdownSettingsPage = document.createElement('section');
-        countdownSettingsPage.setAttribute('id', 'countdown-addon');
-        countdownSettingsPage.setAttribute('role', 'region');
-        countdownSettingsPage.setAttribute('data-rendered', 'true');
-        
-        var countdownSettingsPageString = '<gaia-header action="back" data-href="#root">';
-        countdownSettingsPageString += '<h1>'+wordsSettings[0]+'</h1>';
-        countdownSettingsPageString += '</gaia-header>';
+    var insertPlace = document.querySelector('header h2[data-l10n-id="personalization"]');
+    insertPlace = insertPlace.parentNode.nextElementSibling;
+    if(insertPlace.nodeName.toLowerCase() == "ul") {
+      var wordsSettings = get_all_countdown_words()[config.language]['settings'];
 
-        countdownSettingsPageString += '<div>';
-        countdownSettingsPageString += '<section data-type="list">';
-        countdownSettingsPageString += '<header>';
-        countdownSettingsPageString += '<h2>'+wordsSettings[1]+'</h2>';
-        countdownSettingsPageString += '</header>';
-        countdownSettingsPageString += '<div class="wallpaper" style="height:9rem;">';
-        countdownSettingsPageString += '<img class="countdown-wallpaper" alt="wallpaper preview" style="position: absolute; width: 100%;" />';
-        countdownSettingsPageString += '<button class="wallpaper-button countdown-background-button">';
-        countdownSettingsPageString += '<span data-icon="change-wallpaper" data-l10n-id="changeWallpaperButton"></span>';
-        countdownSettingsPageString += '</button>';
-        countdownSettingsPageString += '</div>';
-        
-        //@todo Search why the countdown.name input is automatically saved into the Settings
-        countdownSettingsPageString += '<header>';
-        countdownSettingsPageString += '<h2>'+wordsSettings[2]+'</h2>';
-        countdownSettingsPageString += '</header>';
-        countdownSettingsPageString += '<ul>';
-        countdownSettingsPageString += '<li>';
-        countdownSettingsPageString += '<p>'+wordsSettings[2]+'</p>';
-        countdownSettingsPageString += '<div class="button icon icon-dialog">';
-        countdownSettingsPageString += '<input type="text" name="countdown.name" />';
-        countdownSettingsPageString += '</div>';
-        countdownSettingsPageString += '</li>';
-        countdownSettingsPageString += '</ul>';
-        
-        countdownSettingsPageString += '<header>';
-        countdownSettingsPageString += '<h2 data-l10n-id="dateMessage"></h2>';
-        countdownSettingsPageString += '</header>';
-        countdownSettingsPageString += '<ul class="time-manual">';
-        countdownSettingsPageString += '<li>';
-        countdownSettingsPageString += '<p data-l10n-id="dateMessage"></p>';
-        countdownSettingsPageString += '<input class="countdown-date-input date-picker" type="date" name="countdown.date" value="" min="1970-1-1" max="2035-12-31"/>';
-        countdownSettingsPageString += '</li>';
-        countdownSettingsPageString += '<li>';
-        countdownSettingsPageString += '<p data-l10n-id="timeMessage"></p>';
-        countdownSettingsPageString += '<input type="time" name="countdown.time" class="countdown-time-input time-picker"/>';
-        countdownSettingsPageString += '</li>';
-        countdownSettingsPageString += '</ul>';
+      //Create the page for the countdown settings
+      var countdownSettingsPage = document.createElement('section');
+      countdownSettingsPage.setAttribute('id', 'countdown-addon');
+      countdownSettingsPage.setAttribute('role', 'region');
+      countdownSettingsPage.setAttribute('data-rendered', 'true');
 
-        //@todo Search why the countdown.display input is automatically saved into the Settings
-        countdownSettingsPageString += '<header>';
-        countdownSettingsPageString += '<h2>'+wordsSettings[3]+'</h2>';
-        countdownSettingsPageString += '</header>';
-        countdownSettingsPageString += '<ul>';
-        countdownSettingsPageString += '<li>';
-        countdownSettingsPageString += '<p>'+wordsSettings[3]+'</p>';
-        countdownSettingsPageString += '<div class="button icon icon-dialog">';
-        countdownSettingsPageString += '<select class="countdown-display-input" name="countdown.display">';
-        countdownSettingsPageString += '<option value="full">'+wordsSettings[4]+'</option>';
-        countdownSettingsPageString += '<option value="min">'+wordsSettings[5]+'</option>';
-        countdownSettingsPageString += '</select>';
-        countdownSettingsPageString += '</div>';
-        countdownSettingsPageString += '</li>';
-        countdownSettingsPageString += '</ul>';
+      var countdownSettingsPageString = '<gaia-header action="back" data-href="#root">';
+      countdownSettingsPageString += '<h1>'+wordsSettings[0]+'</h1>';
+      countdownSettingsPageString += '</gaia-header>';
 
-        countdownSettingsPageString += '</section>';
-        countdownSettingsPageString += '</div>';
+      countdownSettingsPageString += '<div class="countdown-addon-injected">';
+      countdownSettingsPageString += '<section data-type="list">';
+      countdownSettingsPageString += '<header>';
+      countdownSettingsPageString += '<h2>'+wordsSettings[1]+'</h2>';
+      countdownSettingsPageString += '</header>';
+      countdownSettingsPageString += '<div class="wallpaper" style="height:9rem;">';
+      countdownSettingsPageString += '<img class="countdown-wallpaper" alt="wallpaper preview" style="position: absolute; width: 100%;" />';
+      countdownSettingsPageString += '<button class="wallpaper-button countdown-background-button">';
+      countdownSettingsPageString += '<span data-icon="change-wallpaper" data-l10n-id="changeWallpaperButton"></span>';
+      countdownSettingsPageString += '</button>';
+      countdownSettingsPageString += '</div>';
 
-        countdownSettingsPage.innerHTML = countdownSettingsPageString;
-        
-        var body = document.querySelector('body');
-        body.appendChild(countdownSettingsPage);
-        
-        var inputCountdownDate = document.querySelector('.countdown-date-input');
-        get_input_mozSettings('countdown.date');
-        inputCountdownDate.addEventListener("input", function(){
-          set_onchange_input_mozSettings(this);
-        }, false);
-        
-        var inputCountdownTime = document.querySelector('.countdown-time-input');
-        get_input_mozSettings('countdown.time');
-        inputCountdownTime.addEventListener("input", function(){
-          set_onchange_input_mozSettings(this);
-        }, false);
-        
-        var buttonCountdownBackground = document.querySelector('.countdown-background-button');
-        get_input_mozSettings('countdown.background');
-        buttonCountdownBackground.addEventListener("click", function(){
-          select_countdown_background();
-        }, false);
-        
-        //Create the link into the root page of the settings app
-        var countdownSettingsElement = document.createElement('li');
-        countdownSettingsElement.classList.add('countdown-addon-settings');
-        var countdownSettingsElementLink = document.createElement('a');
-        countdownSettingsElementLink.classList.add('menu-item');
-        countdownSettingsElementLink.setAttribute('aria-label', wordsSettings[0]);
-        countdownSettingsElementLink.setAttribute('aria-describedby', 'countdown-addon-desc');
-        countdownSettingsElementLink.setAttribute('href', '#countdown-addon');
-        countdownSettingsElementLink.setAttribute('data-icon', '⌛');
-        
-        var countdownSettingsElementSpan = document.createElement('span');
-        countdownSettingsElementSpan.appendChild(document.createTextNode(wordsSettings[0]));
-        var countdownSettingsElementSmall = document.createElement('small');
-        countdownSettingsElementSmall.setAttribute('id', 'countdown-addon-desc');
-        countdownSettingsElementSmall.classList.add('menu-item-desc');
-        countdownSettingsElementLink.appendChild(countdownSettingsElementSpan);
-        countdownSettingsElementLink.appendChild(countdownSettingsElementSmall);
-        
-        countdownSettingsElement.appendChild(countdownSettingsElementLink);
-        insertPlace.appendChild(countdownSettingsElement);
-        
-      }
+      //@todo Search why the countdown.name input is automatically saved into the Settings
+      countdownSettingsPageString += '<header>';
+      countdownSettingsPageString += '<h2>'+wordsSettings[2]+'</h2>';
+      countdownSettingsPageString += '</header>';
+      countdownSettingsPageString += '<ul>';
+      countdownSettingsPageString += '<li>';
+      countdownSettingsPageString += '<p>'+wordsSettings[2]+'</p>';
+      countdownSettingsPageString += '<div class="button icon icon-dialog">';
+      countdownSettingsPageString += '<input type="text" name="countdown.name" />';
+      countdownSettingsPageString += '</div>';
+      countdownSettingsPageString += '</li>';
+      countdownSettingsPageString += '</ul>';
+
+      countdownSettingsPageString += '<header>';
+      countdownSettingsPageString += '<h2 data-l10n-id="dateMessage"></h2>';
+      countdownSettingsPageString += '</header>';
+      countdownSettingsPageString += '<ul class="time-manual">';
+      countdownSettingsPageString += '<li>';
+      countdownSettingsPageString += '<p data-l10n-id="dateMessage"></p>';
+      countdownSettingsPageString += '<input class="countdown-date-input date-picker" type="date" name="countdown.date" value="" min="1970-1-1" max="2035-12-31"/>';
+      countdownSettingsPageString += '</li>';
+      countdownSettingsPageString += '<li>';
+      countdownSettingsPageString += '<p data-l10n-id="timeMessage"></p>';
+      countdownSettingsPageString += '<input type="time" name="countdown.time" class="countdown-time-input time-picker"/>';
+      countdownSettingsPageString += '</li>';
+      countdownSettingsPageString += '</ul>';
+
+      //@todo Search why the countdown.display input is automatically saved into the Settings
+      countdownSettingsPageString += '<header>';
+      countdownSettingsPageString += '<h2>'+wordsSettings[3]+'</h2>';
+      countdownSettingsPageString += '</header>';
+      countdownSettingsPageString += '<ul>';
+      countdownSettingsPageString += '<li>';
+      countdownSettingsPageString += '<p>'+wordsSettings[3]+'</p>';
+      countdownSettingsPageString += '<div class="button icon icon-dialog">';
+      countdownSettingsPageString += '<select class="countdown-display-input" name="countdown.display">';
+      countdownSettingsPageString += '<option value="full">'+wordsSettings[4]+'</option>';
+      countdownSettingsPageString += '<option value="min">'+wordsSettings[5]+'</option>';
+      countdownSettingsPageString += '</select>';
+      countdownSettingsPageString += '</div>';
+      countdownSettingsPageString += '</li>';
+      countdownSettingsPageString += '</ul>';
+
+      countdownSettingsPageString += '</section>';
+      countdownSettingsPageString += '</div>';
+
+      countdownSettingsPage.innerHTML = countdownSettingsPageString;
+
+      var body = document.querySelector('body');
+      body.appendChild(countdownSettingsPage);
+
+      var inputCountdownDate = document.querySelector('.countdown-date-input');
+      get_input_mozSettings('countdown.date');
+      inputCountdownDate.addEventListener("input", function(){
+        set_onchange_input_mozSettings(this);
+      }, false);
+
+      var inputCountdownTime = document.querySelector('.countdown-time-input');
+      get_input_mozSettings('countdown.time');
+      inputCountdownTime.addEventListener("input", function(){
+        set_onchange_input_mozSettings(this);
+      }, false);
+
+      var buttonCountdownBackground = document.querySelector('.countdown-background-button');
+      get_input_mozSettings('countdown.background');
+      buttonCountdownBackground.addEventListener("click", function(){
+        select_countdown_background();
+      }, false);
+
+      //Create the link into the root page of the settings app
+      var countdownSettingsElement = document.createElement('li');
+      countdownSettingsElement.classList.add('countdown-addon-settings');
+      var countdownSettingsElementLink = document.createElement('a');
+      countdownSettingsElementLink.classList.add('menu-item');
+      countdownSettingsElementLink.setAttribute('aria-label', wordsSettings[0]);
+      countdownSettingsElementLink.setAttribute('aria-describedby', 'countdown-addon-desc');
+      countdownSettingsElementLink.setAttribute('href', '#countdown-addon');
+      countdownSettingsElementLink.setAttribute('data-icon', '⌛');
+
+      var countdownSettingsElementSpan = document.createElement('span');
+      countdownSettingsElementSpan.appendChild(document.createTextNode(wordsSettings[0]));
+      var countdownSettingsElementSmall = document.createElement('small');
+      countdownSettingsElementSmall.setAttribute('id', 'countdown-addon-desc');
+      countdownSettingsElementSmall.classList.add('menu-item-desc');
+      countdownSettingsElementLink.appendChild(countdownSettingsElementSpan);
+      countdownSettingsElementLink.appendChild(countdownSettingsElementSmall);
+
+      countdownSettingsElement.appendChild(countdownSettingsElementLink);
+      insertPlace.appendChild(countdownSettingsElement);
     }
   }
 }
@@ -369,7 +364,7 @@ function compte_a_rebours(config) {
     update_countdown_configuration(config);
     all_words = get_vocabulary_language(config.display, config.language);
     var dateCountdown = create_date_from_string_date_time(config.date, config.time);
-    compte_a_rebours_task(config.name, config.date, all_words);
+    compte_a_rebours_task(config.name, dateCountdown, all_words);
   }, 1000);
 }
 
@@ -378,7 +373,11 @@ function compte_a_rebours(config) {
 */
 function create_date_from_string_date_time(date, time) {
   var completeDate = date+"T"+time+":00";
-  return(new Date(completeDate));
+  var dateSplit = date.split("-");
+  var hourSplit = time.split(":");
+  var utcDate = new Date(Date.UTC(parseInt(dateSplit[0]), (parseInt(dateSplit[1]) - 1), parseInt(dateSplit[2]), parseInt(hourSplit[0]), parseInt(hourSplit[1]), 0));
+
+  return(utcDate);
 }
 
 /*
@@ -392,10 +391,16 @@ function compte_a_rebours_task(nom_evenement, date_fin, all_words)
 	  compte_a_rebours_p.parentNode.removeChild(compte_a_rebours_p);
 	}
 	var compte_a_rebours_p = document.createElement('p');
+  
+  var now = new Date;
+  var utc_timestamp = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() , 
+      now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
 
-	var date_actuelle = new Date();
-	var date_evenement = new Date(date_fin);
-	var total_secondes = (date_evenement - date_actuelle) / 1000;
+	var date_actuelle = new Date(utc_timestamp);
+	var date_evenement = date_fin;
+  var timezoneDifference = now.getTimezoneOffset() * 60;
+  console.log(timezoneDifference);
+	var total_secondes = ((date_evenement.getTime() - date_actuelle.getTime()) / 1000) + timezoneDifference;
   
 	var prefixe = nom_evenement+all_words[5];
 	if (total_secondes < 0)
@@ -429,12 +434,12 @@ function compte_a_rebours_task(nom_evenement, date_fin, all_words)
 function get_all_countdown_words() {
   return ({
     'en' : {
-      'min' : ["d", "h", "m", "s", "", " in ", "Finished"],
+      'min' : ["d", "h", "m", "s", "", " in ", " Finished"],
       'full': ["days", "hours", "minutes", "seconds", "and", " in ", " has already begun!"],
       'settings': ['Countdown', 'Background image', 'Event name', 'Display mode', 'Full words', 'Abbreviations']
     },
     'fr' : {
-      'min' : ["j", "h", "m", "s", "", " dans ", "Terminé"],
+      'min' : ["j", "h", "m", "s", "", " dans ", " Terminé"],
       'full': ["jours", "heures", "minutes", "secondes", "et", " dans ", " a déjà commencé!"],
       'settings': ['Compte à rebours', 'Image de fond', 'Nom de l\'événement', 'Mode d\'affichage', 'Mots complets', 'Abréviations']
     },

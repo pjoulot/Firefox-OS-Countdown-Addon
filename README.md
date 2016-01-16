@@ -7,6 +7,7 @@ An addon for Firefox OS devices (using Gaia) which add a countdown on the homesc
 - v1.0: static countdown (For the sci-fi convention T'imagin 2 in Paris)
 - v1.1: still static. Support Multilanguage: (english and french). Static full/min display: (Set by default to min now)
 - v1.2: Now dynamic! A linked settings page is added in the settings App to configure the countdown.
+- v1.3: Correct bug on the countdown calculation and change default settings.
 
 ### Dev (future evolutions)
 - Refactoring the code to open contribution [Marketplace]

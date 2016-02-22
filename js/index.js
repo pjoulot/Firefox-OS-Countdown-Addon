@@ -34,7 +34,6 @@ function initialize() {
     
     set_user_countdown_settings(countdownConfiguration);
     
-    console.log(countdownConfiguration);
     console.log('passed 3');
 
 
@@ -140,10 +139,10 @@ function get_selector_countdown_homescreen() {
   var url = get_app_url_without_tag();
   var selector = 'apps';
   if(url == "app://verticalhome.gaiamobile.org/index.html") {
-    selector = document.getElementById('icons');
+    selector = 'icons';
   }
   if(url == "app://homescreen.gaiamobile.org/index.html") {
-    selector = document.getElementById('apps');
+    selector = 'apps';
   }
   return selector;
 }
@@ -358,15 +357,26 @@ function select_countdown_background() {
 */
 function set_onchange_input_mozSettings(input) {
   var name = input.getAttribute("name");
-  var obj = {};
-  obj[name] = input.value;
-  var lock = navigator.mozSettings.createLock();
-  var result = lock.set(obj);
-  result.onsuccess = function () {
-    console.log("the settings has been changed");
+  //For homescreens using the old way
+  if(!is_new_configuration_way()) {
+    var obj = {};
+    obj[name] = input.value;
+    var lock = navigator.mozSettings.createLock();
+    var result = lock.set(obj);
+    result.onsuccess = function () {
+      console.log("the settings has been changed");
+    }
+    result.onerror = function () {
+      console.log("An error occure, the settings remain unchanged");
+    }
   }
-  result.onerror = function () {
-    console.log("An error occure, the settings remain unchanged");
+  //For homescreens using the new way
+  else {
+    navigator.getDataStores('homescreen_settings').then(function(stores) {
+      stores[0].put(input.value,name).then(function(id) {
+      // object successfully updated
+      });
+    });
   }
 }
 
@@ -374,22 +384,41 @@ function set_onchange_input_mozSettings(input) {
 ** Function to get a saved setting value and set the field in the settings app
 */
 function get_input_mozSettings(name) {
-  var lock    = navigator.mozSettings.createLock();
-  var setting = lock.get(name);
-  setting.onsuccess = function () {
-    if(name == "countdown.background") {
-      var backgroundCountdownImage = document.querySelector('.countdown-wallpaper');
-      var blobUrl = URL.createObjectURL(this.result[name]);
-      backgroundCountdownImage.setAttribute('src', blobUrl);
+  //For homescreens using the old way
+  if(!is_new_configuration_way()) {
+    var lock    = navigator.mozSettings.createLock();
+    var setting = lock.get(name);
+    setting.onsuccess = function () {
+      if(name == "countdown.background") {
+        var backgroundCountdownImage = document.querySelector('.countdown-wallpaper');
+        var blobUrl = URL.createObjectURL(this.result[name]);
+        backgroundCountdownImage.setAttribute('src', blobUrl);
+      }
+      else {
+        var inputElement = document.querySelector('*[name="'+name+'"]');
+        inputElement.setAttribute('value', setting.result[name]);
+      }
     }
-    else {
-      var inputElement = document.querySelector('*[name="'+name+'"]');
-      inputElement.setAttribute('value', setting.result[name]);
+
+    setting.onerror = function () {
+      console.warn('An error occured: ' + setting.error);
     }
   }
-
-  setting.onerror = function () {
-    console.warn('An error occured: ' + setting.error);
+  //For homescreens using the new way
+  else {
+    navigator.getDataStores('homescreen_settings').then(function(stores) {
+      stores[0].get(name).then(function(obj) {
+        if(name == "countdown.background") {
+          var backgroundCountdownImage = document.querySelector('.countdown-wallpaper');
+          var blobUrl = URL.createObjectURL(obj);
+          backgroundCountdownImage.setAttribute('src', blobUrl);
+        }
+        else {
+          var inputElement = document.querySelector('*[name="'+name+'"]');
+          inputElement.setAttribute('value', obj);
+        }
+      });
+    });
   }
 }
 

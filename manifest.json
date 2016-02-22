@@ -5,11 +5,17 @@
     "version": "1.3",
     "author": "Philippe Joulot",
     "content_scripts": [{
-      "matches": ["app://verticalhome.gaiamobile.org/index.html*", "app://settings.gaiamobile.org/index.html*"],
+      "matches": ["app://verticalhome.gaiamobile.org/index.html*", "app://homescreen.gaiamobile.org/index.html*", "app://settings.gaiamobile.org/index.html*"],
       "css": [],
       "js": ["js/index.js"]
     }],
     "icons": {
       "128": "/icons/128.png"
+    },
+    "datastores-access": {
+      "homescreen_settings": {
+        "readonly": false,
+        "description": "Read and write home screen settings."
+      }
     }
 }

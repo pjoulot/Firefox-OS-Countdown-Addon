@@ -20,6 +20,7 @@ function initialize() {
       return;
   }
   else {
+    
     var user_language = select_language(window.navigator.language);
     var countdownConfiguration = {
       name: "Firefox OS",
@@ -28,32 +29,15 @@ function initialize() {
       display: false,
       language: user_language
     };
+    
+    console.log('passed');
+    
+    set_user_countdown_settings(countdownConfiguration);
+    
+    console.log(countdownConfiguration);
+    console.log('passed 3');
 
-    //Overwrite default configuration with user config
-    var lock    = navigator.mozSettings.createLock();
-    var setting = lock.get('countdown.name');
-    setting.onsuccess = function () {
-      countdownConfiguration.name = setting.result['countdown.name'];
-    };
-    var setting2 = lock.get('countdown.display');
-    setting2.onsuccess = function () {
-      countdownConfiguration.display = setting2.result['countdown.display'];
-    };
-    var setting3 = lock.get('countdown.time');
-    setting3.onsuccess = function () {
-      console.log(setting3.result['countdown.time']);
-      countdownConfiguration.time = setting3.result['countdown.time'];
-    };
-    var setting4 = lock.get('countdown.date');
-    setting4.onsuccess = function () {
-      console.log(setting4.result['countdown.date']);
-      countdownConfiguration.date = setting4.result['countdown.date'];
-    };
-    var setting5 = lock.get('countdown.time');
-    setting5.onsuccess = function () {
-      console.log(setting5.result['countdown.time']);
-      countdownConfiguration.time = setting5.result['countdown.time'];
-    };
+
     //The background is not done the same way because we do not want to apply the CSS property everytime
 
     countdown_homescreen(countdownConfiguration);
@@ -90,15 +74,91 @@ function initialize() {
 }
 
 /*
+** Function to initialize the configuration object with the settings defined by the user
+*/
+function set_user_countdown_settings(configObject) {
+    if(!is_new_configuration_way()) {
+      // OLD HOMESCREEN
+      var lock    = navigator.mozSettings.createLock();
+      var setting = lock.get('countdown.name');
+      setting.onsuccess = function () {
+        countdownConfiguration.name = setting.result['countdown.name'];
+      };
+      var setting2 = lock.get('countdown.display');
+      setting2.onsuccess = function () {
+        countdownConfiguration.display = setting2.result['countdown.display'];
+      };
+      var setting3 = lock.get('countdown.time');
+      setting3.onsuccess = function () {
+        console.log(setting3.result['countdown.time']);
+        countdownConfiguration.time = setting3.result['countdown.time'];
+      };
+      var setting4 = lock.get('countdown.date');
+      setting4.onsuccess = function () {
+        console.log(setting4.result['countdown.date']);
+        countdownConfiguration.date = setting4.result['countdown.date'];
+      };
+    }
+    else {
+      console.log('passed 2');
+      //NEW HOMESCREEN
+      
+      navigator.getDataStores('homescreen_settings').then(function(stores) {
+        stores[0].get('countdown.name').then(function(obj) {
+          countdownConfiguration.name = obj;
+        });
+        stores[0].get('countdown.display').then(function(obj) {
+          countdownConfiguration.display = obj;
+        });
+        stores[0].get('countdown.time').then(function(obj) {
+          countdownConfiguration.time = obj;
+        });
+        stores[0].get('countdown.date').then(function(obj) {
+          countdownConfiguration.date = obj;
+        });
+      });
+    }
+}
+
+/*
+** Function to know if the homescreen used by the user use the old way or the new way for configuration
+** @return int (true for the new way and false for the old)
+*/
+function is_new_configuration_way() {
+  var value = true;
+  var url = get_app_url_without_tag();
+  if(url == "app://verticalhome.gaiamobile.org/index.html") {
+    value = false;
+  }
+  return value;
+}
+
+/*
+** Function to get the selector to insert the countdown on the homescreen
+*/
+function get_selector_countdown_homescreen() {
+  var url = get_app_url_without_tag();
+  var selector = 'apps';
+  if(url == "app://verticalhome.gaiamobile.org/index.html") {
+    selector = document.getElementById('icons');
+  }
+  if(url == "app://homescreen.gaiamobile.org/index.html") {
+    selector = document.getElementById('apps');
+  }
+  return selector;
+}
+
+/*
 ** Function to add the countdown on the homescreen
 */
 function countdown_homescreen(config) {
   var url = get_app_url_without_tag();
-  if(url == "app://verticalhome.gaiamobile.org/index.html") {
+  if(url == "app://verticalhome.gaiamobile.org/index.html" || url == "app://homescreen.gaiamobile.org/index.html") {
     var user_language = select_language(window.navigator.language);
     var imageBackgroundBase64 = get_image_base64();
-
-    var body = document.getElementById('icons');
+    
+    var selector = get_selector_countdown_homescreen();
+    var body = document.getElementById(selector);
     var coundownAddonContainer = document.createElement('div');
     coundownAddonContainer.classList.add('addon-countdown');
     coundownAddonContainer.classList.add('countdown-addon-injected');

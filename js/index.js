@@ -46,22 +46,22 @@ function listen_configuration_changes(countdownConfiguration) {
     //Add listeners to the settings to make changes when user modify
     navigator.mozSettings.addObserver('countdown.name', handleCountdownNameChanged);
     function handleCountdownNameChanged(event) {
-      countdownConfiguration.name = event.settingValue
+      countdownConfiguration.name = event.settingValue;
     }
 
     navigator.mozSettings.addObserver('countdown.display', handleCountdownDisplayChanged);
     function handleCountdownDisplayChanged(event) {
-      countdownConfiguration.display = event.settingValue
+      countdownConfiguration.display = event.settingValue;
     }
 
     navigator.mozSettings.addObserver('countdown.date', handleCountdownDateChanged);
     function handleCountdownDateChanged(event) {
-      countdownConfiguration.date = event.settingValue
+      countdownConfiguration.date = event.settingValue;
     }
 
     navigator.mozSettings.addObserver('countdown.time', handleCountdownTimeChanged);
     function handleCountdownTimeChanged(event) {
-      countdownConfiguration.time = event.settingValue
+      countdownConfiguration.time = event.settingValue;
     }
 
     navigator.mozSettings.addObserver('countdown.background', handleCountdownBackgroundChanged);
@@ -72,7 +72,33 @@ function listen_configuration_changes(countdownConfiguration) {
     }
   }
   else {
-    
+    navigator.getDataStores('homescreen_settings').then(function(stores) {
+      stores[0].onchange = function(e) {
+        if (e.operation == 'updated') {
+          stores[0].get(e.id).then(function(obj) {
+            switch (e.id) {
+              case "countdown.name":
+                countdownConfiguration.name = obj;
+                break;
+              case "countdown.display":
+                countdownConfiguration.display = obj;
+                break;
+              case "countdown.date":
+                countdownConfiguration.date = obj;
+                break;
+              case "countdown.time":
+                countdownConfiguration.time = obj;
+                break;
+              case "countdown.background":
+                var bannerImage = document.getElementById('banner-countdown');
+                var blobUrl = URL.createObjectURL(obj);
+                bannerImage.style.backgroundImage = "url('"+blobUrl+"')";
+                break;
+            }
+          });
+        }
+      }
+    });
   }
 }
 
@@ -293,6 +319,12 @@ function countdown_settings(config) {
       inputCountdownTime.addEventListener("input", function(){
         set_onchange_input_mozSettings(this);
       }, false);
+      
+      var selectCountdownDisplay = document.querySelector('.countdown-display-input');
+      get_input_mozSettings('countdown.display');
+      selectCountdownDisplay.addEventListener("change", function(){
+        set_onchange_input_mozSettings(this);
+      }, false);
 
       var buttonCountdownBackground = document.querySelector('.countdown-background-button');
       get_input_mozSettings('countdown.background');
@@ -376,12 +408,19 @@ function select_countdown_background() {
 /*
 ** Function to set setting variables when the date and the time input change
 */
-function set_onchange_input_mozSettings(input) {
-  var name = input.getAttribute("name");
+function set_onchange_input_mozSettings(tag) {
+  var name = tag.getAttribute("name");
+  var elementValue = '';
+  if(tag.tagName.toLowerCase() === 'select') {
+    elementValue = tag.options[tag.selectedIndex].value;
+  }
+  else {
+    elementValue = tag.value;
+  }
   //For homescreens using the old way
   if(!is_new_configuration_way()) {
     var obj = {};
-    obj[name] = input.value;
+    obj[name] = elementValue;
     var lock = navigator.mozSettings.createLock();
     var result = lock.set(obj);
     result.onsuccess = function () {
@@ -394,7 +433,7 @@ function set_onchange_input_mozSettings(input) {
   //For homescreens using the new way
   else {
     navigator.getDataStores('homescreen_settings').then(function(stores) {
-      stores[0].put(input.value,name).then(function(id) {
+      stores[0].put(elementValue, name).then(function(id) {
       // object successfully updated
       });
     });
@@ -415,6 +454,10 @@ function get_input_mozSettings(name) {
         var blobUrl = URL.createObjectURL(this.result[name]);
         backgroundCountdownImage.setAttribute('src', blobUrl);
       }
+      else if (name == "countdown.display") {
+        var selectElement = document.querySelector('*[name="'+name+'"]');
+        selectElement.querySelector('option[value="'+this.result[name]+'"]').setAttribute('selected', 'selected');
+      }
       else {
         var inputElement = document.querySelector('*[name="'+name+'"]');
         inputElement.setAttribute('value', setting.result[name]);
@@ -433,6 +476,10 @@ function get_input_mozSettings(name) {
           var backgroundCountdownImage = document.querySelector('.countdown-wallpaper');
           var blobUrl = URL.createObjectURL(obj);
           backgroundCountdownImage.setAttribute('src', blobUrl);
+        }
+        else if (name == "countdown.display") {
+          var selectElement = document.querySelector('*[name="'+name+'"]');
+          selectElement.querySelector('option[value="'+obj+'"]').setAttribute('selected', 'selected');
         }
         else {
           var inputElement = document.querySelector('*[name="'+name+'"]');

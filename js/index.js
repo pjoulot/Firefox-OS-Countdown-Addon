@@ -165,12 +165,12 @@ function is_new_configuration_way() {
 */
 function get_selector_countdown_homescreen() {
   var url = get_app_url_without_tag();
-  var selector = 'apps';
+  var selector = '#apps-panel .scrollable';
   if(url == "app://verticalhome.gaiamobile.org/index.html") {
-    selector = 'icons';
+    selector = '#icons';
   }
   if(url == "app://homescreen.gaiamobile.org/index.html") {
-    selector = 'apps';
+    selector = '#apps-panel .scrollable';
   }
   return selector;
 }
@@ -185,12 +185,12 @@ function countdown_homescreen(config) {
     var imageBackgroundBase64 = get_image_base64();
     
     var selector = get_selector_countdown_homescreen();
-    var body = document.getElementById(selector);
+    var body = document.querySelector(selector);
     var coundownAddonContainer = document.createElement('div');
     coundownAddonContainer.classList.add('addon-countdown');
     coundownAddonContainer.classList.add('countdown-addon-injected');
     var margeSize = (100 - WIDTH_COUNTDOWN) / 2;
-    coundownAddonContainer.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: relative; width: '+WIDTH_COUNTDOWN+'%; height: '+HEIGHT_COUNTDOWN+'px; margin-left: '+margeSize+'%; margin-right: '+margeSize+'%; border: 1px solid black; color: white;');
+    coundownAddonContainer.setAttribute('style', 'font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.7); position: relative; z-index: 100; width: '+WIDTH_COUNTDOWN+'%; height: '+HEIGHT_COUNTDOWN+'px; margin-left: '+margeSize+'%; margin-right: '+margeSize+'%; border: 1px solid black; color: white;');
     var bannerPicture = document.createElement('div');
     //bannerPicture.src="css/timagin.jpg";
     bannerPicture.id="banner-countdown";
@@ -199,7 +199,7 @@ function countdown_homescreen(config) {
     countdownText.id="addon-countdown";
     var closeBtn = document.createElement('button');
 
-    countdownText.setAttribute('style', 'float: left; padding-top: 0.5em; width: 75%; line-height: 16px; left: 1em; margin: 0; margin-left: 5%;');
+    countdownText.setAttribute('style', 'float: left; padding-top: 0.5em; width: 75%; height: 65px; line-height: 16px; left: 1em; margin: 0; margin-left: 5%;');
     closeBtn.setAttribute('style', 'width: 20%; padding-top: 0.5em; font-size: 18px; line-height: 2em; right: 0.33em; border: none; background: none; display: block; color: white;');
 
     coundownAddonContainer.appendChild(bannerPicture);
@@ -556,7 +556,7 @@ function compte_a_rebours_task(nom_evenement, date_fin, all_words)
 	var date_actuelle = new Date(utc_timestamp);
 	var date_evenement = date_fin;
   var timezoneDifference = now.getTimezoneOffset() * 60;
-  console.log(timezoneDifference);
+
 	var total_secondes = ((date_evenement.getTime() - date_actuelle.getTime()) / 1000) + timezoneDifference;
   
 	var prefixe = nom_evenement+all_words[5];

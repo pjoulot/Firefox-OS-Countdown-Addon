@@ -8,16 +8,15 @@ An addon for Firefox OS devices (using Gaia) which add a countdown on the homesc
 - v1.1: still static. Support Multilanguage: (english and french). Static full/min display: (Set by default to min now)
 - v1.2: Now dynamic! A linked settings page is added in the settings App to configure the countdown.
 - v1.3: Correct bug on the countdown calculation and change default settings.
+- v1.4: Compatibility with the new homescreen
 
-** The dev branch is NOT STABLE at all for now. I am changing all the code to be compatible with the new homescreen.  **
+** The dev branch can be not totally stable and sometimes broken. Use it only for tests.  **
 
 ### Dev (future evolutions)
 - Refactoring the code to open contribution [Marketplace]
 - Support more languages [Marketplace]
-- When the countdown is finished, french words are displayed. Correct that! [Marketplace]
 - Remove special case on background and use it in the config object (Just test if the old is the same to avoid repaint) [Marketplace]
 - Initialize settings when installing and remove all elements and listeners when desinstalling or disabling  [Marketplace]
-- Make the addon working on the new homescreen. For now, it's working only with the old. [Marketplace]
 - Optimize performances
 
 The tag [Marketplace] means that the evolution is required to put the addon on the Firefox marketplace.

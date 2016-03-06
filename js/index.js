@@ -548,6 +548,7 @@ function compte_a_rebours_task(nom_evenement, date_fin, all_words)
 	  compte_a_rebours_p.parentNode.removeChild(compte_a_rebours_p);
 	}
 	var compte_a_rebours_p = document.createElement('p');
+  compte_a_rebours_p.setAttribute('style', 'white-space: normal;');
   
   var now = new Date;
   var utc_timestamp = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() , 

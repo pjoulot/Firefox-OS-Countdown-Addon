@@ -361,14 +361,14 @@ function countdown_settings(config) {
 */
 function select_countdown_background() {
   var widthCountdown = (window.screen.width) * (WIDTH_COUNTDOWN / 100); 
-  var heightCountdown = HEIGHT_COUNTDOWN; 
+  var heightCountdown = HEIGHT_COUNTDOWN - 75;
   var mozActivity = new MozActivity({
     name: 'pick',
     data: {
       type: ['image/*'],
       // XXX: This will not work with Desktop Fx / Simulator.
       width: Math.ceil(widthCountdown * window.devicePixelRatio),
-      height: Math.ceil(heightCountdown)
+      height: Math.ceil(heightCountdown * window.devicePixelRatio)
     }
   });
   mozActivity.onsuccess = function() {

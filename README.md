@@ -9,17 +9,22 @@ An addon for Firefox OS devices (using Gaia) which add a countdown on the homesc
 - v1.2: Now dynamic! A linked settings page is added in the settings App to configure the countdown.
 - v1.3: Correct bug on the countdown calculation and change default settings.
 - v1.4: Compatibility with the new homescreen
+- v1.5: Disable/Enable, Uninstall support (Clean what the addon has done)
 
 ** The dev branch can be not totally stable and sometimes broken. Use it only for tests.  **
 
 ### Dev (future evolutions)
-- Refactoring the code to open contribution [Marketplace]
-- Support more languages [Marketplace]
-- Remove special case on background and use it in the config object (Just test if the old is the same to avoid repaint) [Marketplace]
-- Initialize settings when installing and remove all elements and listeners when desinstalling or disabling  [Marketplace]
+- Use localization.js
+- Support more languages 
+- Remove special case on background and use it in the config object (Just test if the old is the same to avoid repaint)
 - Optimize performances
 
-The tag [Marketplace] means that the evolution is required to put the addon on the Firefox marketplace.
+-------------------------------------------------------------------------------------------------------------------
+/ ! \ DEVELOPMENT ARE STOPPED FOR A WHILE. It is stable for FirefoxOS 2.5 and 2.6.
+The transition branch of BootToGecko will change a lot of API and this addon will be broken during the transition.
+That's why I stop development until the transition branch is almost stable again.
+But you can use this addon on Firefox 2.5 and 2.6, there is almost no bugs in it.
+-------------------------------------------------------------------------------------------------------------------
 
 ##Informations
 

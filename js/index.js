@@ -102,6 +102,18 @@ function listen_configuration_changes(countdownConfiguration) {
       }
     });
   }
+  
+  //Listen for the settings app if the language has changed
+  var url = get_app_url_without_tag();
+  if(url == "app://settings.gaiamobile.org/index.html") {
+    window.onlanguagechange = function(ev) {
+      //Relaunch the whole process (remove and set again)
+      var user_language = select_language(window.navigator.language);
+      countdownConfiguration.language = user_language;
+      uninitialize();
+      countdown_settings(countdownConfiguration);
+    };
+  }
 }
 
 /*

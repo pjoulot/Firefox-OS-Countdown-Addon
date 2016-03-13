@@ -38,6 +38,8 @@ function initialize() {
     countdown_settings(countdownConfiguration);
     
     listen_configuration_changes(countdownConfiguration);
+    navigator.mozApps.mgmt.addEventListener('enabledstatechange', onEnabledStateChange);
+    navigator.mozApps.mgmt.addEventListener('uninstall', onUninstall);
   }
 }
 
@@ -99,6 +101,18 @@ function listen_configuration_changes(countdownConfiguration) {
         }
       }
     });
+  }
+  
+  //Listen for the settings app if the language has changed
+  var url = get_app_url_without_tag();
+  if(url == "app://settings.gaiamobile.org/index.html") {
+    window.onlanguagechange = function(ev) {
+      //Relaunch the whole process (remove and set again)
+      var user_language = select_language(window.navigator.language);
+      countdownConfiguration.language = user_language;
+      uninitialize();
+      countdown_settings(countdownConfiguration);
+    };
   }
 }
 
@@ -361,14 +375,14 @@ function countdown_settings(config) {
 */
 function select_countdown_background() {
   var widthCountdown = (window.screen.width) * (WIDTH_COUNTDOWN / 100); 
-  var heightCountdown = HEIGHT_COUNTDOWN; 
+  var heightCountdown = HEIGHT_COUNTDOWN - 75;
   var mozActivity = new MozActivity({
     name: 'pick',
     data: {
       type: ['image/*'],
       // XXX: This will not work with Desktop Fx / Simulator.
       width: Math.ceil(widthCountdown * window.devicePixelRatio),
-      height: Math.ceil(heightCountdown)
+      height: Math.ceil(heightCountdown * window.devicePixelRatio)
     }
   });
   mozActivity.onsuccess = function() {
@@ -652,4 +666,57 @@ function get_app_url_without_tag() {
     returnUrl = url;
   }
   return returnUrl;
+}
+
+function onEnabledStateChange(event) {
+  var app = event.application;
+  if (app.manifest.name === 'CountDown Addon' && !app.enabled) {
+    uninitialize();
+  }
+}
+
+function onUninstall(event) {
+  navigator.mozApps.mgmt.removeEventListener('uninstall', onUninstall);
+  var app = event.application;
+  if (app.manifest.name === 'CountDown Addon') {
+    uninitialize();
+    //Remove Data from the new way
+    if(is_new_configuration_way()) {
+      navigator.getDataStores('homescreen_settings').then(function(stores) {
+        stores[0].remove('countdown.name').then(function(obj) {});
+        stores[0].remove('countdown.display').then(function(obj) {});
+        stores[0].remove('countdown.time').then(function(obj) {});
+        stores[0].remove('countdown.date').then(function(obj) {});
+        stores[0].remove('countdown.background').then(function(obj) {});
+      }); 
+    }
+    //It seems that we can't remove settings with the old way
+  }
+}
+
+function uninitialize() {
+  var url = get_app_url_without_tag();
+  if(url == "app://settings.gaiamobile.org/index.html") {
+    //Remove the settings page for the countdown
+    var countdownSettingsPage = document.querySelector('#countdown-addon');
+    countdownSettingsPage.parentNode.removeChild(countdownSettingsPage);
+    //Remove the settings link to the page for the countdown
+    var countdownSettingLink = document.querySelector('.countdown-addon-settings');
+    countdownSettingLink.parentNode.removeChild(countdownSettingLink);
+  }
+  //The homescreen is the else case
+  else {
+    var selector = get_selector_countdown_homescreen();
+    var countdownContainer = document.querySelector(selector+' .addon-countdown');
+    countdownContainer.parentNode.removeChild(countdownContainer);
+    //Remove listeners on the homescreen
+    if(!is_new_configuration_way()) {
+      navigator.mozSettings.removeObserver('countdown.name', handleCountdownNameChanged);
+      navigator.mozSettings.removeObserver('countdown.display', handleCountdownDisplayChanged);
+      navigator.mozSettings.removeObserver('countdown.date', handleCountdownDateChanged);
+      navigator.mozSettings.removeObserver('countdown.time', handleCountdownTimeChanged);
+      navigator.mozSettings.removeObserver('countdown.background', handleCountdownBackgroundChanged);
+    }
+  }
+  navigator.mozApps.mgmt.removeEventListener('enabledstatechange', onEnabledStateChange);
 }
